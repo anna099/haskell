@@ -4,7 +4,8 @@
 
 conjunction = '&'
 disjunction = 'v'
-syntax = conjunction : disjunction : "01"
+conditional = '>'
+syntax = conjunction : disjunction : conditional : "01"
 
 eval :: [Char] -> Bool
 eval expr = not (unexpected expr) && (length expr == 3) && getExprValue expr
@@ -18,8 +19,13 @@ getExprValue expr
       getCharValue (head expr) && getCharValue (last expr)
   | expr !! 1 == disjunction =
       getCharValue (head expr) || getCharValue (last expr)
+  | expr !! 1 == conditional =
+      evalConditional (getCharValue (head expr)) (getCharValue (last expr))
 
 getCharValue :: Char -> Bool
-getCharValue x
-  | x == '1' = True
-  | x == '0' = False
+getCharValue '1' = True
+getCharVAlue '0' = False
+
+evalConditional :: Bool -> Bool -> Bool
+evalConditional True False = False
+evalConditional x y = True
