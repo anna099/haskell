@@ -1,6 +1,11 @@
 -- evaluates expressions of a very basic form of propositional logic.
--- the language has conjunctive and disjunctive operators, and the
--- program currently only evaluates formulas with two values.
+-- examples:
+--      1&1 returns true
+--      1>0 returns false
+--      1&(0v(0>1)) returns true
+module Propositional (eval) where
+
+import Data.List
 
 conjunction = '&'
 disjunction = 'v'
@@ -8,7 +13,17 @@ conditional = '>'
 syntax = conjunction : disjunction : conditional : "01"
 
 eval :: [Char] -> Bool
-eval expr = not (unexpected expr) && (length expr == 3) && getExprValue expr
+eval expr
+  | head expr == '(' && last expr == ')' = eval (init (tail expr))
+  | elem '(' expr = eval ((withoutParen expr) ++ strAsBool (eval (parentheses expr)))
+  | otherwise = not (unexpected expr) && (length expr == 3) && getExprValue expr
+
+parentheses :: [Char] -> [Char]
+parentheses str = init (tail (
+  take (last (elemIndices ')' str)) (drop (head (elemIndices '(' str)) str)))
+
+withoutParen :: [Char] -> [Char]
+withoutParen str = take (head (elemIndices '(' str)) str
 
 unexpected :: [Char] -> Bool
 unexpected expr = any (\x -> notElem x syntax) expr
@@ -24,8 +39,12 @@ getExprValue expr
 
 getCharValue :: Char -> Bool
 getCharValue '1' = True
-getCharVAlue '0' = False
+getCharValue '0' = False
 
 evalConditional :: Bool -> Bool -> Bool
 evalConditional True False = False
 evalConditional x y = True
+
+strAsBool :: Bool -> [Char]
+strAsBool False = "0"
+strAsBool True = "1"
