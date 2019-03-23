@@ -13,7 +13,11 @@ conditional = '>'
 syntax = conjunction : disjunction : conditional : "01"
 
 eval :: [Char] -> Bool
+eval "" = False
 eval expr
+  | (length (elemIndices '(' expr))
+      /= (length (elemIndices ')' expr)) =
+        error "Unmatching parentheses in expression."
   | head expr == '(' && last expr == ')' = eval (init (tail expr))
   | elem '(' expr = eval ((withoutParen expr) ++ strAsBool (eval (parentheses expr)))
   | otherwise = not (unexpected expr) && (length expr == 3) && getExprValue expr
