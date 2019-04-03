@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ghc -o til Main.hs && rm *.hi && rm *.o
